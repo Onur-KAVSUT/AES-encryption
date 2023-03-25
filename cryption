@@ -1,0 +1,29 @@
+const crypto = require('crypto');
+const axios = require('axios');
+
+// Generate Key and IV values
+const key = crypto.randomBytes(32);
+const iv = crypto.randomBytes(16);
+
+// AES encryption function
+function encrypt(text) {
+  let cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key), iv);
+  let encrypted = cipher.update(text);
+  encrypted = Buffer.concat([encrypted, cipher.final()]);
+  return { iv: iv.toString('hex'), encryptedData: encrypted.toString('hex') };
+}
+
+// User data to be encrypted
+const data = "Hello, this is an example data";
+
+// Encrypt the data
+const encryptedData = encrypt(data);
+
+// Send the encrypted data to the server
+axios.post('https://example.com', encryptedData)
+  .then(function (response) {
+    console.log(response.data);
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
